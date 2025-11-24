@@ -3,6 +3,8 @@ package cn.adwadg.murasame.events;
 import cn.adwadg.murasame.Murasame;
 import cn.adwadg.murasame.Registry.KeyBindings;
 import cn.adwadg.murasame.Registry.SoundRegistry;
+import cn.adwadg.murasame.playerdata.PlayerSoulDataManager;
+import cn.adwadg.murasame.playerdata.PlayerSoulData;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -73,7 +75,9 @@ public class PlayerEventHandler {
             double y = player.getY() + player.getEyeHeight()+ 0.5 + lookVec.y * 3.5;
             double z = player.getZ() + lookVec.z * 3.5 - rightVec.z * 2.3;
 
-            if(!KeyBindings.isToggled){
+            // 使用玩家特定的设置而不是全局设置
+            PlayerSoulData playerData = PlayerSoulDataManager.getOrCreatePlayerData(player);
+            if(playerData.shouldShowMurasameSoul()){
                 spawnSpawnEffect(player.serverLevel(), x, y, z);
             }
 
@@ -95,7 +99,8 @@ public class PlayerEventHandler {
             if(isHolding){
                 Murasame.playSound(player, sound);
             }
-            if(!KeyBindings.isToggled){
+            // 使用玩家特定的设置而不是全局设置
+            if(playerData.shouldShowMurasameSoul()){
                 Murasame.playSound(player, SoundEvents.EXPERIENCE_ORB_PICKUP);
             }
         }

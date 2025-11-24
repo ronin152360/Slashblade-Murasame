@@ -2,12 +2,12 @@
   "structures": [
     {
       "structure": "murasame:shrine",
-      "weight": 1
+      "weight": 5
     }
   ],
   "placement": {
     "type": "minecraft:random_spread",
-    "spacing": 32,
+    "spacing": 16,
     "separation": 8,
     "salt": 123456789
   }

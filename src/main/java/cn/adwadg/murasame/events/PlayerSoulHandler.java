@@ -1,28 +1,20 @@
 package cn.adwadg.murasame.events;
 
 import cn.adwadg.murasame.Murasame;
-import cn.adwadg.murasame.Registry.KeyBindings;
 import cn.adwadg.murasame.Registry.ModEntities;
 import cn.adwadg.murasame.Entities.EntityMurasameSoul;
-import cn.adwadg.murasame.client.utils.MurasameEvolutionTracker;
+import cn.adwadg.murasame.playerdata.PlayerSoulDataManager;
+import cn.adwadg.murasame.playerdata.PlayerSoulData;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -37,12 +29,17 @@ public class PlayerSoulHandler {
             // 检查已有实体
             EntityMurasameSoul existing = soulMap.get(player.getUUID());
             if (existing != null && existing.isAlive()) {
+                return; // 如果已有实体，不再创建新实体
+            }
+            
+            PlayerSoulData playerData = PlayerSoulDataManager.getOrCreatePlayerData(player);
+            // 如果玩家设置为隐藏，则不创建实体
+            if (!playerData.shouldShowMurasameSoul()) {
                 return;
             }
+            
             ServerLevel level = (ServerLevel) player.level();
             EntityMurasameSoul soul = new EntityMurasameSoul(ModEntities.MURASAME_SOUL.get(), level);
-
-
 
             float distance = 3.5f;
             float horizontalOffset = -2.3f;
@@ -79,46 +76,77 @@ public class PlayerSoulHandler {
             soul.discard();
         }
     }
+    
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         Player player = event.getEntity();
         removeSoul(player);
     }
+    
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event){
         Player player = event.getEntity();
         removeSoul(player);
     }
 
-
-
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if(!KeyBindings.isToggled){
-            if (event.phase == TickEvent.Phase.START &&
-                    event.player instanceof ServerPlayer player) {
-                // 每3 tick检测一次（更快响应）
-                if (player.tickCount % 3 == 0) {
-                    ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-                    boolean shouldHave = false;
-                    if(stack.getItem() instanceof ItemSlashBlade && stack.getCapability(ItemSlashBlade.BLADESTATE)
-                            .map(state -> "item.murasame.murasamemaru_awakened".equals(state.getTranslationKey()))
-                            .orElse(false)){
-                        shouldHave = true;
-                    }
-                    EntityMurasameSoul soul = soulMap.get(player.getUUID());
+        // 使用玩家特定的设置而不是全局设置
+        PlayerSoulData playerData = PlayerSoulDataManager.getOrCreatePlayerData(event.player);
+        boolean showMurasameSoul = playerData.shouldShowMurasameSoul();
+        
+        if (event.phase == TickEvent.Phase.START &&
+                event.player instanceof ServerPlayer player) {
+            // 每3 tick检测一次（更快响应）
+            if (player.tickCount % 3 == 0) {
+                ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+                boolean shouldHave = false;
+                if(stack.getItem() instanceof ItemSlashBlade && stack.getCapability(ItemSlashBlade.BLADESTATE)
+                        .map(state -> "item.murasame.murasamemaru_awakened".equals(state.getTranslationKey()))
+                        .orElse(false)){
+                    shouldHave = true;
+                }
+                EntityMurasameSoul soul = soulMap.get(player.getUUID());
 
-                    if (shouldHave) {
-                        if (soul == null || !soul.isAlive()) {
-                            spawnSoulEntity(player);
-                        }
-                    } else if (soul != null) {
+                if (shouldHave && showMurasameSoul) {
+                    if (soul == null || !soul.isAlive()) {
+                        spawnSoulEntity(player);
+                    }
+                } else {
+                    // 如果玩家没有合适的剑或选择了隐藏，则移除实体
+                    if (soul != null) {
                         removeSoul(player);
                     }
                 }
             }
-        }else {
-            removeSoul(event.player);
+        }
+    }
+    
+    // 添加一个公共方法来强制更新特定玩家的实体状态
+    public static void updateSoulState(Player player) {
+        PlayerSoulData playerData = PlayerSoulDataManager.getOrCreatePlayerData(player);
+        boolean showMurasameSoul = playerData.shouldShowMurasameSoul();
+        
+        ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+        boolean shouldHave = false;
+        if(stack.getItem() instanceof ItemSlashBlade && stack.getCapability(ItemSlashBlade.BLADESTATE)
+                .map(state -> "item.murasame.murasamemaru_awakened".equals(state.getTranslationKey()))
+                .orElse(false)){
+            shouldHave = true;
+        }
+        
+        EntityMurasameSoul soul = soulMap.get(player.getUUID());
+        
+        if (shouldHave && showMurasameSoul) {
+            // 需要显示实体但实体不存在时创建
+            if (soul == null || !soul.isAlive()) {
+                spawnSoulEntity(player);
+            }
+        } else {
+            // 不需要显示实体时移除
+            if (soul != null) {
+                removeSoul(player);
+            }
         }
     }
 }

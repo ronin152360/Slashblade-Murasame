@@ -11,6 +11,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
@@ -83,8 +84,12 @@ public class SoundEventHandler {
     @SubscribeEvent
     public static void onPlayerSleep(PlayerSleepInBedEvent event) {
         Player player = event.getEntity();
-        if (event.getResultStatus() == null && isHoldingAwakenedMurasame(player)) {
-            Murasame.playSound(player, SoundRegistry.MURASAME_NIGHT.get());
+        Level level = player.level();
+        long time = level.getDayTime() % 24000;
+        if(time >= 13000 && time < 23000){
+            if (event.getResultStatus() == null && isHoldingAwakenedMurasame(player)) {
+                Murasame.playSound(player, SoundRegistry.MURASAME_NIGHT.get());
+            }
         }
     }
 

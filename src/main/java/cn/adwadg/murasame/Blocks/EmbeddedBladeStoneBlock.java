@@ -3,6 +3,7 @@ package cn.adwadg.murasame.Blocks;
 import cn.adwadg.murasame.Murasame;
 import cn.adwadg.murasame.Registry.ModBlocks;
 import cn.adwadg.murasame.TileEntity.BlockEntity.EmbeddedBladeStoneEntity;
+import cn.adwadg.murasame.config.ModConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -71,7 +72,7 @@ public class EmbeddedBladeStoneBlock extends Block implements EntityBlock {
             }
 
             // 检查等级要求
-            if (player.experienceLevel < 50) {
+            if (player.experienceLevel < ModConfig.GAINLEVELNEEDED.get()) {
                 player.displayClientMessage(Component.translatable("message.murasame.need_level"), true);
                 level.playSound(null, pos, SoundEvents.VILLAGER_NO, SoundSource.BLOCKS, 0.8f, 1.0f);
                 return InteractionResult.FAIL;
@@ -111,8 +112,9 @@ public class EmbeddedBladeStoneBlock extends Block implements EntityBlock {
                 cn.adwadg.murasame.advancement.ModAdvancements.grantFromStone(serverPlayer);
             }
 
-
-            player.experienceLevel -= 50;
+            if(ModConfig.GAINCLEANLEVEL.get()){
+                player.experienceLevel -= ModConfig.GAINLEVELNEEDED.get();
+            }
             level.setBlock(pos, ModBlocks.EMPTY_STONE.get().defaultBlockState(), 3);
             return InteractionResult.SUCCESS;
         }
@@ -126,7 +128,7 @@ public class EmbeddedBladeStoneBlock extends Block implements EntityBlock {
             for (EntityType<?> undead : UNDEAD_MOBS) {
                 totalUndeadKills += serverPlayer.getStats().getValue(Stats.ENTITY_KILLED.get(undead));
             }
-            return totalUndeadKills >= 500;
+            return totalUndeadKills >= ModConfig.GAINKILLNEEDED.get();
         }
         return false;
     }
@@ -137,6 +139,6 @@ public class EmbeddedBladeStoneBlock extends Block implements EntityBlock {
                 .stream()
                 .filter(effect -> effect.getEffect().getCategory() == MobEffectCategory.BENEFICIAL)
                 .collect(Collectors.toList());
-        return positiveEffects.size() >= 5;
+        return positiveEffects.size() >= ModConfig.GAINEFFECTSNEEDED.get();
     }
 }

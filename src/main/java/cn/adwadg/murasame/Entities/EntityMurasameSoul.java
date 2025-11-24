@@ -115,6 +115,10 @@ public class EntityMurasameSoul extends PathfinderMob {
         this.setInvisible(!visibility);
         this.entityData.set(VISIBLE, visibility);
     }
+    
+    public boolean isVisible() {
+        return this.entityData.get(VISIBLE);
+    }
 
     // 添加持久化保护
     @Override
@@ -275,6 +279,10 @@ public class EntityMurasameSoul extends PathfinderMob {
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         if (OWNER_UUID.equals(key)) {
             this.cachedOwner = null; // 强制重新获取owner
+        }
+        if (VISIBLE.equals(key)) {
+            // 当可见性数据更新时，同步到实体状态
+            this.setInvisible(!this.entityData.get(VISIBLE));
         }
         super.onSyncedDataUpdated(key);
     }

@@ -5,6 +5,7 @@ import cn.adwadg.murasame.Slasharts.SpatialSlash;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.ability.StunManager;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -14,36 +15,51 @@ public class ComboStateRegistry {
 
     public static final RegistryObject<ComboState> SPATIAL_SLASH = COMBO_STATES.register("spatial_slash",
             ComboState.Builder.newInstance()
-                    .startAndEnd(2200, 2300)  // 100帧的动画时间
-                    .priority(60)              // 较高优先级
-                    .speed(0.8F)               // 稍微减缓动画速度，增强时间减缓感
-                    .next(entity -> SlashBlade.prefix("none"))  // 完成后回到空闲状态
+                    .startAndEnd(0, 60)  // 缩短为60帧，更紧凑
+                    .priority(60)
+                    .speed(1.5F)  // 进一步加快动画速度
+                    .next(entity -> SlashBlade.prefix("none"))
                     .nextOfTimeout(entity -> SlashBlade.prefix("none"))
 
-                    // 开始时减缓时间和固定生物
+                    // 立即开始空间固定和第一轮斩击
                     .addTickAction(ComboState.TimeLineTickAction.getBuilder()
-                            .put(0, SpatialSlash::doSpatialSlash) // 立即开始空间固定
+                            .put(0, SpatialSlash::doSpatialSlash) // 立即空间固定
+                            .put(0, (entityIn) -> entityIn.setDeltaMovement(Vec3.ZERO)) // 完全停止移动
+                            .put(0, (entity) -> SpatialSlash.executeSingleSlash(entity, 0, 1.0F)) // 立即第1道斩击
                             .build())
 
-                    // 玩家移动持续减缓
+                    // 连续斩击序列 - 从第0帧立即开始
                     .addTickAction(ComboState.TimeLineTickAction.getBuilder()
-                            .put(5, (entityIn) -> entityIn.setDeltaMovement(entityIn.getDeltaMovement().scale(0.3)))
-                            .put(10, (entityIn) -> entityIn.setDeltaMovement(entityIn.getDeltaMovement().scale(0.3)))
-                            .put(15, (entityIn) -> entityIn.setDeltaMovement(entityIn.getDeltaMovement().scale(0.3)))
-                            .put(20, (entityIn) -> entityIn.setDeltaMovement(entityIn.getDeltaMovement().scale(0.3)))
+                            // 第一轮快速斩击 (0-10帧)
+                            .put(2, (entity) -> SpatialSlash.executeSingleSlash(entity, 72, 1.1F))
+                            .put(4, (entity) -> SpatialSlash.executeSingleSlash(entity, 144, 1.2F))
+                            .put(6, (entity) -> SpatialSlash.executeSingleSlash(entity, 216, 1.1F))
+                            .put(8, (entity) -> SpatialSlash.executeSingleSlash(entity, 288, 1.0F))
+
+                            // 第二轮强力斩击 (10-20帧)
+                            .put(10, (entity) -> SpatialSlash.executeSingleSlash(entity, 36, 1.3F))
+                            .put(12, (entity) -> SpatialSlash.executeSingleSlash(entity, 108, 1.4F))
+                            .put(14, (entity) -> SpatialSlash.executeSingleSlash(entity, 180, 1.5F))
+                            .put(16, (entity) -> SpatialSlash.executeSingleSlash(entity, 252, 1.4F))
+                            .put(18, (entity) -> SpatialSlash.executeSingleSlash(entity, 324, 1.3F))
                             .build())
 
-                    // 释放圆形斩击（第50帧）
+                    // 收招和恢复 - 斩击结束后立即开始
                     .addTickAction(ComboState.TimeLineTickAction.getBuilder()
-                            .put(50, SpatialSlash::executeCircularSlash) // 释放范围斩击
+                            .put(25, SpatialSlash::releaseSpatialHold) // 提前释放空间固定
+                            .put(40, (entityIn) -> {
+                                // 快速恢复移动能力
+                                Vec3 current = entityIn.getDeltaMovement();
+                                entityIn.setDeltaMovement(current.scale(2.0));
+                            })
                             .build())
 
-                    // 结束时释放所有固定并恢复移动
-                    .addTickAction(ComboState.TimeLineTickAction.getBuilder()
-                            .put(95, SpatialSlash::releaseSpatialHold) // 结束前释放
-                            .build())
-
-                    // 防止下落和添加命中效果
-                    .addHitEffect((t, a) -> StunManager.setStun(t, 30)) // 中等眩晕效果
+                    // 命中效果
+                    .addHitEffect((target, attacker) -> {
+                        float distance = target.distanceTo(attacker);
+                        int stunTime = distance < 3 ? 40 : 25;
+                        StunManager.setStun(target, stunTime);
+                    })
                     ::build);
+
 }

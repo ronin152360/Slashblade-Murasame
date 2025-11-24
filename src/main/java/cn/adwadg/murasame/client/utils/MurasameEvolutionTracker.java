@@ -2,10 +2,14 @@ package cn.adwadg.murasame.client.utils;
 
 import cn.adwadg.murasame.Murasame;
 import cn.adwadg.murasame.Registry.SoundRegistry;
+import cn.adwadg.murasame.Specialeffects.MurasameBlessing;
+import cn.adwadg.murasame.config.ModConfig;
 import cn.adwadg.murasame.events.PlayerEventHandler;
 import cn.adwadg.murasame.events.SoundEventHandler;
 import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -21,8 +25,8 @@ public class MurasameEvolutionTracker {
     private static final String EVOLVED_TAG = "murasame_evolved";
 
     // 进化条件
-    public static final int REQUIRED_KILLS = 1000;
-    public static final int REQUIRED_SOULS = 50000; // 新条件：Proud Soul数量
+    public static final int REQUIRED_KILLS = ModConfig.EVKILLNEEDED.get();
+    public static final int REQUIRED_SOULS = ModConfig.EVPSNEEDED.get();
 
     public static void checkEvolution(Player player, ItemStack stack) {
         if (!isValidBlade(stack)) return;
@@ -39,11 +43,15 @@ public class MurasameEvolutionTracker {
     }
 
     private static void evolveBlade(Player player, ItemStack stack, ISlashBladeState state) {
+        ListTag se = new ListTag();
+        se.add(StringTag.valueOf("murasame:murasame_blessing"));
         // 更新模型和属性
         state.setModel(new ResourceLocation("murasame", "models/murasame/murasamemaru_awakened.obj"));
         state.setTexture(new ResourceLocation("murasame", "models/murasame/murasamemaru_awakened.png"));
         state.setBaseAttackModifier(40.0f);
         state.setTranslationKey("item.murasame.murasamemaru_awakened");
+        state.setSlashArtsKey(new ResourceLocation(Murasame.MOD_ID,"spatial_slash"));
+        state.setSpecialEffects(se);
 
         // 添加附魔
         stack.enchant(Enchantments.SHARPNESS, 15);

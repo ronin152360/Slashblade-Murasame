@@ -40,7 +40,6 @@ public class SpatialSlash {
             if (target != entity && target.isAlive()) {
                 frozenEntities.put(target, target.getDeltaMovement());
                 target.setDeltaMovement(Vec3.ZERO);
-                target.setNoGravity(true);
             }
         }
 
@@ -74,12 +73,20 @@ public class SpatialSlash {
         playerOriginalSpeeds.remove(entity);
     }
 
-    public static void executeCircularSlash(LivingEntity entity) {
+    public static void executeSingleSlash(LivingEntity entity, float angle, float power) {
         if (entity.level().isClientSide()) return;
 
-        for (int i = 0; i < 10; i++) {
-            float angle = i * 36f;
-            AttackManager.doSlash(entity, angle, Vec3.ZERO, true, false, 1.2F);
+        ServerLevel level = (ServerLevel) entity.level();
+
+        // 执行单道斩击，根据power调整威力
+        AttackManager.doSlash(entity, angle, Vec3.ZERO, true, false, power);
+
+        // 同步粒子效果 - 根据威力调整粒子强度
+        int particleCount = (int) (power * 10);
+
+        // 轻微屏幕震动效果（近距离）
+        if (power >= 1.3F) {
         }
     }
+
 }
