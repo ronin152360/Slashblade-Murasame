@@ -3,24 +3,18 @@
   "item.murasame.murasamemaru_awakened": "§6Shinto§a「Murasamemaru」",
   "block.murasame.embedded_stone": "Embedded Stone",
   "block.murasame.empty_stone": "Empty Embedded Stone",
-
   "message.murasame.need_level": "You need at least level 50 to take this blade",
   "message.murasame.need_more_undead_kills": "You need at least 500 kills",
   "message.murasame.need_more_buffs": "You need at least 5 kinds of positive effects",
   "message.murasame.evolved": "§6§k111§aMurasamemaru has awakened§6§k111",
-
   "advancements.murasame.get_murasame.title": "§6The Legendary Blade",
   "advancements.murasame.get_murasame.description": "Obtain the Murasamemaru from the sacred shrine",
-
   "entity.murasame.soul": "Murasame",
-
   "itemGroup.murasame_tab": "Murasame",
-
   "se.murasame.murasame_blessing": "Murasame's Blessing",
-
   "slash_art.murasame.spatial_slash": "§a§k11§dSpatial Slash§a§k11",
-
   "key.murasame.toggle_soul": "Toggle Blade Soul Entity",
-
-  "category.murasame": "Murasame"
+  "category.murasame": "Murasame",
+  "item.murasame.tsukikage": "§bMoonblade§7「Tsukikage」",
+  "item.murasame.tsukikage_awakened": "§9Celestial§b「Tsukikage」"
 }

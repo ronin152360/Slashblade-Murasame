@@ -120,7 +120,7 @@ public class PlayerEventHandler {
     private static boolean isAwakenedMurasame(ItemStack stack) {
         return stack.getItem() instanceof ItemSlashBlade &&
                 stack.getCapability(ItemSlashBlade.BLADESTATE)
-                        .map(state -> "item.murasame.murasamemaru_awakened".equals(state.getTranslationKey()))
+                        .map(state -> "item.murasame.tsukikage_awakened".equals(state.getTranslationKey()))
                         .orElse(false);
     }
 
