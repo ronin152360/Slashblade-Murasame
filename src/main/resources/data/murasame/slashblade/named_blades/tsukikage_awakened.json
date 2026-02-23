@@ -1,0 +1,33 @@
+{
+  "enchantments": [
+    {
+      "id": "minecraft:sharpness",
+      "lvl": 8
+    },
+    {
+      "id": "minecraft:looting",
+      "lvl": 4
+    },
+    {
+      "id": "minecraft:unbreaking",
+      "lvl": 6
+    }
+  ],
+  "item": "slashblade:slashblade",
+  "name": "murasame:tsukikage_awakened",
+  "properties": {
+    "attack_base": 24.0,
+    "max_damage": 380,
+    "slash_art": "slashblade:wave_edge",
+    "special_effects": [],
+    "sword_type": [
+      "bewitched"
+    ]
+  },
+  "render": {
+    "carry_type": "default",
+    "model": "murasame:models/murasame/murasamemaru_awakened.obj",
+    "texture": "murasame:models/murasame/murasamemaru_awakened.png",
+    "summon_sword_color": 10040115
+  }
+}

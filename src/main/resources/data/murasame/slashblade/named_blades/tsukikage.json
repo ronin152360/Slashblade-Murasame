@@ -1,0 +1,29 @@
+{
+  "enchantments": [
+    {
+      "id": "minecraft:sharpness",
+      "lvl": 4
+    },
+    {
+      "id": "minecraft:sweeping",
+      "lvl": 3
+    }
+  ],
+  "item": "slashblade:slashblade",
+  "name": "murasame:tsukikage",
+  "properties": {
+    "attack_base": 14.0,
+    "max_damage": 220,
+    "slash_art": "slashblade:judgement_cut",
+    "special_effects": [],
+    "sword_type": [
+      "bewitched"
+    ]
+  },
+  "render": {
+    "carry_type": "default",
+    "model": "murasame:models/murasame/murasamemaru.obj",
+    "texture": "murasame:models/murasame/murasamemaru.png",
+    "summon_sword_color": 10040115
+  }
+}

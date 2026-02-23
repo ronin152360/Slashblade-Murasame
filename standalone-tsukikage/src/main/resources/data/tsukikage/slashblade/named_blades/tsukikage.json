@@ -1,0 +1,20 @@
+{
+  "enchantments": [
+    {"id": "minecraft:sharpness", "lvl": 4}
+  ],
+  "item": "slashblade:slashblade",
+  "name": "tsukikage:tsukikage",
+  "properties": {
+    "attack_base": 14.0,
+    "max_damage": 220,
+    "slash_art": "slashblade:judgement_cut",
+    "special_effects": [],
+    "sword_type": ["bewitched"]
+  },
+  "render": {
+    "carry_type": "default",
+    "model": "tsukikage:models/tsukikage/tsukikage.obj",
+    "texture": "tsukikage:models/tsukikage/tsukikage.png",
+    "summon_sword_color": 10040115
+  }
+}

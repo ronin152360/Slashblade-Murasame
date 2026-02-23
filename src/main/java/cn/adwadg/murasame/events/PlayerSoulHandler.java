@@ -102,7 +102,7 @@ public class PlayerSoulHandler {
                 ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
                 boolean shouldHave = false;
                 if(stack.getItem() instanceof ItemSlashBlade && stack.getCapability(ItemSlashBlade.BLADESTATE)
-                        .map(state -> "item.murasame.murasamemaru_awakened".equals(state.getTranslationKey()))
+                        .map(state -> "item.murasame.tsukikage_awakened".equals(state.getTranslationKey()))
                         .orElse(false)){
                     shouldHave = true;
                 }
@@ -130,7 +130,7 @@ public class PlayerSoulHandler {
         ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
         boolean shouldHave = false;
         if(stack.getItem() instanceof ItemSlashBlade && stack.getCapability(ItemSlashBlade.BLADESTATE)
-                .map(state -> "item.murasame.murasamemaru_awakened".equals(state.getTranslationKey()))
+                .map(state -> "item.murasame.tsukikage_awakened".equals(state.getTranslationKey()))
                 .orElse(false)){
             shouldHave = true;
         }
